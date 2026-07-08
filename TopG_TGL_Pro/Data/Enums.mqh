@@ -1,10 +1,27 @@
-// Enums.mqh
-// Part of TopG_TGL_Pro
-// Placeholder header for enumerations
+#pragma once
 
-#ifndef __ENUMS_MQH__
-#define __ENUMS_MQH__
+enum ENUM_TGL_DIRECTION
+{
+   BUY_TGL = 0,
+   SELL_TGL = 1
+};
 
-// Enums will be defined here.
+enum ENUM_TGL_STATE
+{
+   NEW_LEVEL = 0,
+   WAIT_TOUCH,
+   ACTIVE_LEVEL,
+   WAIT_CHOCH,
+   WAIT_BOS,
+   WAIT_WAVE,
+   ENTRY_READY,
+   TRADE_RUNNING,
+   FINISHED,
+   INVALID_LEVEL
+};
 
-#endif // __ENUMS_MQH__
+enum ENUM_SWING_TYPE
+{
+   SWING_HIGH,
+   SWING_LOW
+};
