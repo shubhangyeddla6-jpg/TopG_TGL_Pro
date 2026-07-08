@@ -1,72 +1,127 @@
-#pragma once
-
 //+------------------------------------------------------------------+
-//| TopG TGL Pro                                                     |
-//| Core Engine                                                      |
-//| Version : 0.1.0-alpha                                            |
+//|                                             Engine.mqh           |
+//|                  TopG TGL Pro - Core Engine                      |
 //+------------------------------------------------------------------+
+#ifndef __TOPG_ENGINE_MQH__
+#define __TOPG_ENGINE_MQH__
 
-class IModule
-{
-public:
-   virtual bool Initialize() = 0;
-   virtual void Update() = 0;
-   virtual void Shutdown() = 0;
-};
+#property strict
+
+#include "../Utils/Logger.mqh"
 
 class CEngine
 {
 private:
 
-   IModule *Modules[32];
-   int ModuleCount;
+   bool      m_Initialized;
+   bool      m_Debug;
+
+   datetime  m_LastBarTime;
+
+   CLogger   m_Logger;
 
 public:
 
    CEngine()
    {
-      ModuleCount = 0;
+      m_Initialized = false;
+      m_Debug       = false;
+      m_LastBarTime = 0;
    }
 
-   bool Register(IModule &module)
-   {
-      if(ModuleCount >= 32)
-         return false;
-
-      Modules[ModuleCount++] = &module;
-
-      return true;
-   }
-
+   //---------------------------------------------------
+   // Initialize Engine
+   //---------------------------------------------------
    bool Initialize()
    {
-      for(int i=0;i<ModuleCount;i++)
-      {
-         if(!Modules[i].Initialize())
-            return false;
-      }
+      if(m_Initialized)
+         return true;
+
+      m_Logger.EnableDebug(m_Debug);
+
+      m_Logger.Info("Initializing TopG Engine...");
+
+      m_LastBarTime = iTime(_Symbol,_Period,0);
+
+      m_Initialized = true;
+
+      m_Logger.Info("Engine Initialized.");
 
       return true;
    }
 
-   void Update()
-   {
-      for(int i=0;i<ModuleCount;i++)
-      {
-         Modules[i].Update();
-      }
-   }
-
+   //---------------------------------------------------
+   // Shutdown
+   //---------------------------------------------------
    void Shutdown()
    {
-      for(int i=0;i<ModuleCount;i++)
-      {
-         Modules[i].Shutdown();
-      }
+      m_Logger.Info("Engine Shutdown.");
+
+      m_Initialized = false;
    }
 
-   int Count() const
+   //---------------------------------------------------
+   // New Bar Detection
+   //---------------------------------------------------
+   bool IsNewBar()
    {
-      return ModuleCount;
+      datetime currentBar=iTime(_Symbol,_Period,0);
+
+      if(currentBar!=m_LastBarTime)
+      {
+         m_LastBarTime=currentBar;
+         return true;
+      }
+
+      return false;
    }
+
+   //---------------------------------------------------
+   // Main Update
+   //---------------------------------------------------
+   void Update()
+   {
+      if(!m_Initialized)
+         return;
+
+      // Only process once per completed candle
+      if(!IsNewBar())
+         return;
+
+      m_Logger.Debug("New Candle Detected");
+
+      //==================================================
+      // Module execution order
+      //==================================================
+
+      // Timeframe Engine
+
+      // Swing Engine
+
+      // Structure Engine
+
+      // TGL Engine
+
+      // Signal Engine
+
+      // Draw Engine
+
+   }
+
+   //---------------------------------------------------
+   // Debug
+   //---------------------------------------------------
+   void EnableDebug(bool enable)
+   {
+      m_Debug = enable;
+      m_Logger.EnableDebug(enable);
+   }
+
+   bool IsInitialized() const
+   {
+      return m_Initialized;
+   }
+
 };
+
+#endif
